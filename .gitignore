@@ -1,0 +1,4 @@
+switches.cfg
+venv/*
+.idea/*
+__pycache__/*
