@@ -1,5 +1,8 @@
+import config
+
+
 def main():
-    print('Backup switches configuration on TFTP\n')
+    print(f'Backup switches configuration on TFTP: {config.TFTP_SERVER}\n')
 
 
 if __name__ == '__main__':
