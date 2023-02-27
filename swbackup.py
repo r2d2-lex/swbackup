@@ -1,5 +1,7 @@
 import config
-import device_vendor
+from device_vendor import Huawei
+from detect_vendor import detect_vendor
+import datetime
 import pexpect
 
 
@@ -24,6 +26,10 @@ class Switch:
         self.switch_context.expect(switch_command)
 
 
+def get_date_time():
+    return datetime.datetime.now().strftime('%Y%m%d')
+
+
 def open_switch_filename(filename):
     with open(filename, 'r') as fs:
         switches = fs.read().splitlines()
@@ -31,7 +37,12 @@ def open_switch_filename(filename):
 
 
 def backup_tftp_config(switch_name):
+    date_part = get_date_time()
     print(f'Start backup of: {switch_name}')
+    vendor = detect_vendor(switch_name)
+    backup_command = vendor.make_backup_command(config.TFTP_SERVER, switch_name, date_part)
+    print(backup_command)
+    print('\n')
 
 
 def main():
