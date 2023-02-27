@@ -8,4 +8,6 @@ Backup switches configuration on TFTP
 TFTP_USERNAME="tftp"
 TFTP_DIRECTORY="/srv/tftp"
 TFTP_ADDRESS="0.0.0.0:69"
-TFTP_OPTIONS="-4 --secure -vvv"
+TFTP_OPTIONS="-4 --create --secure -vvv"
+
+ # systemctl restart tftpd-hpa
