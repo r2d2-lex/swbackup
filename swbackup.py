@@ -40,9 +40,10 @@ def backup_tftp_config(switch_name):
     date_part = get_date_time()
     print(f'Start backup of: {switch_name}')
     vendor = detect_vendor(switch_name)
-    backup_command = vendor.make_backup_command(config.TFTP_SERVER, switch_name, date_part)
-    print(backup_command)
-    print('\n')
+    if vendor:
+        backup_command = vendor.make_backup_command(config.TFTP_SERVER, switch_name, date_part)
+        print(backup_command)
+        print('\n')
 
 
 def main():
