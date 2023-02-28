@@ -33,6 +33,5 @@ def snmp_get(device_address, community, oid, device_port=161) -> str:
     else:
         for varBind in varBinds:
             result = (' = '.join([x.prettyPrint() for x in varBind]))
-        print(result)
 
     return result
