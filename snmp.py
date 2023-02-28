@@ -9,13 +9,18 @@ SNMP_MIB = 'SNMPv2-MIB'
 def snmp_get(device_address, community, oid, device_port=161) -> str:
     result = ''
 
-    iterator = getCmd(
-        SnmpEngine(),
-        CommunityData(community, mpModel=SNMPv2c),
-        UdpTransportTarget((device_address, device_port)),
-        ContextData(),
-        ObjectType(ObjectIdentity(SNMP_MIB, oid, 0))
-    )
+    try:
+        iterator = getCmd(
+            SnmpEngine(),
+            CommunityData(community, mpModel=SNMPv2c),
+            UdpTransportTarget((device_address, device_port)),
+            ContextData(),
+            ObjectType(ObjectIdentity(SNMP_MIB, oid, 0))
+        )
+    except error.PySnmpError:
+        # print(f'Error: {error.PySnmpError.}')
+        print('SNMP Error')
+        return result
 
     try:
         errorIndication, errorStatus, errorIndex, varBinds = next(iterator)
