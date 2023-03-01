@@ -28,6 +28,7 @@ class BaseVendor:
     console_prompt: str = '[>#]'
     password_prompt: str = '[Pp]assword'
     login_prompt: str = ''
+    quit_command: str = ''
 
     def make_backup_command(self, tftp_server, switch_name, backup_date):
         return self.backup_command.format(TFTP_SERVER=tftp_server,
@@ -41,6 +42,8 @@ class Huawei(BaseVendor):
     backup_command: str = 'tftp {TFTP_SERVER} put vrpcfg.zip {SWITCH_NAME}-{BACKUP_DATE}.zip'
     space_wait: str = '---- More ----'
     service: str = BaseVendor.SERVICE_SSH_ACCESS
+    quit_command: str = 'quit'
+
     base_words = (
         'Huawei',
         'S5735',
