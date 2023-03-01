@@ -1,6 +1,9 @@
 from dataclasses import dataclass
 import snmp
 import config
+import logging
+
+logging.basicConfig(level=logging.INFO)
 
 HUAWEI_VENDOR = 'Huawei'
 AT_VENDOR = 'AlliedTelesis'
@@ -29,6 +32,7 @@ class BaseVendor:
     password_prompt: str = '[Pp]assword'
     login_prompt: str = ''
     quit_command: str = ''
+    backup_sucess_message: str = ''
 
     def make_backup_command(self, tftp_server, switch_name, backup_date):
         return self.backup_command.format(TFTP_SERVER=tftp_server,
@@ -40,6 +44,7 @@ class BaseVendor:
 class Huawei(BaseVendor):
     vendor_name: str = HUAWEI_VENDOR
     backup_command: str = 'tftp {TFTP_SERVER} put vrpcfg.zip {SWITCH_NAME}-{BACKUP_DATE}.zip'
+    backup_sucess_message: str = 'TFTP: Uploading the file successfully.'
     space_wait: str = '---- More ----'
     service: str = BaseVendor.SERVICE_SSH_ACCESS
     quit_command: str = 'quit'
@@ -88,7 +93,7 @@ def search_vendor_word(vendor_value):
 
     vendor_value = vendor_value.lower()
     vendor_value = ' '.join(vendor_value.split())
-    print(f'VENDOR STRING: {vendor_value}')
+    logging.debug(f'VENDOR STRING: {vendor_value}')
     for _class in ALL_DEVICE_VENDORS:
         for word in _class.base_words:
             word = word.lower()
@@ -115,7 +120,7 @@ def detect_snmp_vendor(device_name):
     if vendor_value:
         vendor = search_vendor_word(vendor_value)
         if vendor:
-            print(f'Device name: {device_name} - {vendor.vendor_name}')
+            logging.info(f'Device name: {device_name} - {vendor.vendor_name}')
     return vendor
 
 
