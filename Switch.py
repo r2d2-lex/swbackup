@@ -1,6 +1,9 @@
 import pexpect
 
 SSH_OPTIONS = '-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'
+SERVICE_SSH_ACCESS = 'ssh'
+SERVICE_TELNET_ACCESS = 'telnet'
+SERVICE_TFTP_ACCESS = 'tftp'
 
 
 class Switch:
@@ -14,10 +17,10 @@ class Switch:
 
     def __enter__(self):
         connection_command = None
-        if self.switch_vendor.service == 'ssh':
+        if self.switch_vendor.service == SERVICE_SSH_ACCESS:
             connection_command = f'ssh {SSH_OPTIONS} {self.switch_username}@{self.switch_name}'
 
-        if self.switch_vendor.service == 'telnet':
+        if self.switch_vendor.service == SERVICE_TELNET_ACCESS:
             connection_command = f'telnet {self.switch_name}'
 
         print(f'Connection command: {connection_command}')
