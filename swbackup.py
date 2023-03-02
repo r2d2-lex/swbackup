@@ -5,7 +5,7 @@ import datetime
 import logging
 
 # logging.basicConfig(level=logging.CRITICAL, filename=config.LOG_FILE, filemode='w')
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
 
 
 def get_date_time():
@@ -18,15 +18,15 @@ def open_switch_filename(filename):
         return switches
 
 
-def backup_over_ssh(switch_name, vendor):
-    backup_command = vendor.make_backup_command(config.TFTP_SERVER, switch_name, get_date_time())
+def backup_over_console(switch_name, vendor):
+    tftp_server = config.TFTP_SERVER
+    if vendor.tftp_server:
+        tftp_server = vendor.tftp_server
+
+    backup_command = vendor.make_backup_command(tftp_server, switch_name, get_date_time())
     with swSwitch.Switch(switch_name, vendor, 22, config.USERNAME, config.PASSWORD) as switch:
         switch.send_switch_backup_config(backup_command)
         switch.switch_quit_command()
-
-
-def backup_over_telnet(switch_name, vendor):
-    pass
 
 
 def backup_over_tftp(switch_name, vendor):
@@ -38,10 +38,10 @@ def backup_tftp_config(switch_name):
     vendor = detect_vendor(switch_name)
     if vendor:
         if vendor.service == BaseVendor.SERVICE_SSH_ACCESS:
-            backup_over_ssh(switch_name, vendor)
+            backup_over_console(switch_name, vendor)
 
         if vendor.service == BaseVendor.SERVICE_TELNET_ACCESS:
-            backup_over_telnet(switch_name, vendor)
+            backup_over_console(switch_name, vendor)
 
         if vendor.service == BaseVendor.SERVICE_TFTP_ACCESS:
             backup_over_tftp(switch_name, vendor)
@@ -57,7 +57,7 @@ def main():
         for switch in switches:
             backup_tftp_config(switch)
             print('\n')
-            input('Press any key...')
+            # input('Press any key...')
 
 
 if __name__ == '__main__':

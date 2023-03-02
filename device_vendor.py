@@ -3,12 +3,12 @@ import snmp
 import config
 import logging
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
 
 HUAWEI_VENDOR = 'Huawei'
 AT_VENDOR = 'AlliedTelesis'
 HP_VENDOR = 'HP'
-THREE_COM_VENDOR = '3COM'
+T3COM_VENDOR = '3COM'
 VENDOR_OID = 'sysDescr'
 
 
@@ -29,10 +29,11 @@ class BaseVendor:
     backup_command: str = ''
     base_words: tuple = ()
     console_prompt: str = '[>#]'
-    password_prompt: str = '[Pp]assword'
+    password_prompt: str = '[Pp]assword:'
     login_prompt: str = ''
     quit_command: str = ''
-    backup_sucess_message: str = ''
+    backup_success_message: str = ''
+    tftp_server: str = ''
 
     def make_backup_command(self, tftp_server, switch_name, backup_date):
         return self.backup_command.format(TFTP_SERVER=tftp_server,
@@ -44,7 +45,7 @@ class BaseVendor:
 class Huawei(BaseVendor):
     vendor_name: str = HUAWEI_VENDOR
     backup_command: str = 'tftp {TFTP_SERVER} put vrpcfg.zip {SWITCH_NAME}-{BACKUP_DATE}.zip'
-    backup_sucess_message: str = 'TFTP: Uploading the file successfully.'
+    backup_success_message: str = 'TFTP: Uploading the file successfully.'
     space_wait: str = '---- More ----'
     service: str = BaseVendor.SERVICE_SSH_ACCESS
     quit_command: str = 'quit'
@@ -61,7 +62,7 @@ class AlliedTelesis(BaseVendor):
     backup_command: str = 'Upload Method=tftp DestFile={SWITCH_NAME}-{BACKUP_DATE}.cfg Server={TFTP_SERVER} ' \
                           'srcFile=flash:boot.cfg '
     service: str = BaseVendor.SERVICE_TELNET_ACCESS
-    login_prompt: str = 'Login:'
+    login_prompt: str = '[Ll]ogin:'
     base_words = (
         'Allied Telesis',
         'AT-9448Ts',
@@ -79,12 +80,20 @@ class HP(BaseVendor):
 
 
 @dataclass
-class Three_COM(BaseVendor):
-    vendor_name: str = THREE_COM_VENDOR
+class T3COM(BaseVendor):
+    vendor_name: str = T3COM_VENDOR
     service: str = BaseVendor.SERVICE_TELNET_ACCESS
+    backup_command: str = 'tftp {TFTP_SERVER} put startup.cfg {SWITCH_NAME}-{BACKUP_DATE}.cfg'
+    backup_success_message: str = 'File uploaded successfully.'
+    login_prompt: str = 'Username:'
+    quit_command: str = 'quit'
+    tftp_server: str = config.TFTP_SERVER2
+    base_words = (
+        '3Com',
+    )
 
 
-ALL_DEVICE_VENDORS = (Huawei, AlliedTelesis, HP, Three_COM)
+ALL_DEVICE_VENDORS = (Huawei, AlliedTelesis, HP, T3COM)
 
 
 def search_vendor_word(vendor_value):
@@ -109,8 +118,8 @@ def search_vendor_word(vendor_value):
         result = AlliedTelesis()
     if vendor_word == HP_VENDOR:
         result = HP()
-    if vendor_word == THREE_COM_VENDOR:
-        result = Three_COM()
+    if vendor_word == T3COM_VENDOR:
+        result = T3COM()
     return result
 
 
