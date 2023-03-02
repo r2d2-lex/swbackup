@@ -35,14 +35,13 @@ class Switch:
 
         # ----------------------------------------------------------------------------------------------
         if self.switch_vendor.service == SERVICE_TELNET_ACCESS:
-            if not self.send_custom_request(self.switch_vendor.login_prompt, self.switch_username):
+            if not self.send_login_password(self.switch_vendor.login_prompt, self.switch_username):
                 return
 
-        if not self.send_custom_request(self.switch_vendor.password_prompt, self.switch_password):
+        if not self.send_login_password(self.switch_vendor.password_prompt, self.switch_password):
             return
 
-        # !!! send_custom_request не ждёт приглашение консоли...
-        self.expect_return_view()
+        self.wait_console_prompt()
         # ----------------------------------------------------------------------------------------------
         return self
 
@@ -51,7 +50,7 @@ class Switch:
             self.switch_context.close()
             logging.debug('Connection closed...')
 
-    def send_custom_request(self, requested_prompt, custom_request) -> bool:
+    def send_login_password(self, requested_prompt, custom_request) -> bool:
         return_prompt = self.switch_context.expect(requested_prompt)
         if return_prompt == 0:
             logging.debug(f'Requested_prompt: {requested_prompt}\nReturn: {self.switch_context.before}')
@@ -60,11 +59,7 @@ class Switch:
             return_prompt = self.switch_context.sendline(custom_request)
             logging.debug(f'\nReturn: {self.switch_context.before}')
             if return_prompt:
-                print('Return TRUE')
                 return True
-            else:
-                print('Return False')
-                return False
         else:
             logging.error(f'Error interaction to: {self.switch_name}')
             return False
@@ -80,9 +75,9 @@ class Switch:
     def send_switch_command(self, switch_command):
         logging.debug(f'Send switch command: {switch_command}')
         self.switch_context.sendline(switch_command)
-        self.expect_return_view()
+        self.wait_console_prompt()
 
-    def expect_return_view(self):
+    def wait_console_prompt(self):
         if self.switch_context.expect(self.switch_vendor.console_prompt) == 0:
             logging.debug(f'\n----\n{self.switch_context.before}\n---\n')
         else:
