@@ -71,6 +71,7 @@ class Switch:
             logging.info(f'SUCCESS backup config: {self.switch_name}')
         else:
             logging.warning(f'FAIL backup config: {self.switch_name}')
+        self.wait_console_prompt()
 
     def send_switch_command(self, switch_command):
         logging.debug(f'Send switch command: {switch_command}')
