@@ -3,7 +3,7 @@ import logging
 
 logging.basicConfig(level=logging.DEBUG)
 
-
+SSH_AT_CIPHER_OPTIONS = '-c aes256-cbc -oKexAlgorithms=+diffie-hellman-group1-sha1'
 SSH_OPTIONS = '-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'
 SERVICE_SSH_ACCESS = 'ssh'
 SERVICE_TELNET_ACCESS = 'telnet'
@@ -52,8 +52,9 @@ class Switch:
 
     def send_login_password(self, requested_prompt, custom_request) -> bool:
         return_prompt = self.switch_context.expect(requested_prompt)
+        # pexpect.exceptions.TIMEOUT: Timeout exceeded
         if return_prompt == 0:
-            logging.debug(f'Requested_prompt: {requested_prompt}\nReturn: {self.switch_context.before}')
+            logging.debug(f'Requested_prompt: "{requested_prompt}"\nReturn: {self.switch_context.before}')
 
             logging.debug(f'Send Custom_request - {custom_request}')
             return_prompt = self.switch_context.sendline(custom_request)

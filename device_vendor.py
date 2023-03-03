@@ -7,6 +7,7 @@ logging.basicConfig(level=logging.DEBUG)
 
 HUAWEI_VENDOR = 'Huawei'
 AT_VENDOR = 'AlliedTelesis'
+AW_VENDOR = 'AlliedWare'
 HP_VENDOR = 'HP'
 T3COM_VENDOR = '3COM'
 VENDOR_OID = 'sysDescr'
@@ -61,11 +62,20 @@ class AlliedTelesis(BaseVendor):
     vendor_name: str = AT_VENDOR
     backup_command: str = 'Upload Method=tftp DestFile={SWITCH_NAME}-{BACKUP_DATE}.cfg Server={TFTP_SERVER} ' \
                           'srcFile=flash:boot.cfg '
-    service: str = BaseVendor.SERVICE_TELNET_ACCESS
-    login_prompt: str = '[Ll]ogin:'
+    service: str = BaseVendor.SERVICE_SSH_ACCESS
     base_words = (
         'Allied Telesis',
         'AT-9448Ts',
+    )
+
+
+@dataclass
+class AlliedWare(BaseVendor):
+    vendor_name: str = AW_VENDOR
+    service: str = BaseVendor.SERVICE_TELNET_ACCESS
+    login_prompt: str = '[Ll]ogin:'
+    base_words = (
+        'AlliedWare',
     )
 
 
@@ -93,7 +103,7 @@ class T3COM(BaseVendor):
     )
 
 
-ALL_DEVICE_VENDORS = (Huawei, AlliedTelesis, HP, T3COM)
+ALL_DEVICE_VENDORS = (Huawei, AlliedTelesis, HP, T3COM, AlliedWare)
 
 
 def search_vendor_word(vendor_value):
@@ -116,6 +126,8 @@ def search_vendor_word(vendor_value):
         result = Huawei()
     if vendor_word == AT_VENDOR:
         result = AlliedTelesis()
+    if vendor_word == AW_VENDOR:
+        result = AlliedWare()
     if vendor_word == HP_VENDOR:
         result = HP()
     if vendor_word == T3COM_VENDOR:
