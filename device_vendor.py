@@ -11,6 +11,9 @@ AW_VENDOR = 'AlliedWare'
 HP_VENDOR = 'HP'
 T3COM_VENDOR = '3COM'
 VENDOR_OID = 'sysDescr'
+SSH_AT_CIPHER_OPTIONS = '-c aes256-cbc -oKexAlgorithms=+diffie-hellman-group1-sha1'
+SSH_OPTIONS = '-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'
+
 
 
 @dataclass()
@@ -24,17 +27,20 @@ class BaseVendor:
         SERVICE_TFTP_ACCESS,
     )
 
-    vendor_name: str = ''
-    space_wait: str = ''
-    service: str = ''
     backup_command: str = ''
-    base_words: tuple = ()
-    console_prompt: str = '[>#]'
-    password_prompt: str = '[Pp]assword:'
-    login_prompt: str = ''
-    quit_command: str = ''
     backup_success_message: str = ''
+    base_words: tuple = ()
+    console_options: str = SSH_OPTIONS
+    console_prompt: str = '[>#]'
+    login_prompt: str = ''
+    service: str = ''
+    space_wait: str = ''
+    password: str = ''
+    password_prompt: str = '[Pp]assword:'
     tftp_server: str = ''
+    username: str = ''
+    vendor_name: str = ''
+    quit_command: str = ''
 
     def make_backup_command(self, tftp_server, switch_name, backup_date):
         return self.backup_command.format(TFTP_SERVER=tftp_server,
@@ -59,6 +65,7 @@ class Huawei(BaseVendor):
 
 @dataclass
 class AlliedTelesis(BaseVendor):
+    console_options: str = f'{SSH_AT_CIPHER_OPTIONS} {SSH_OPTIONS}'
     vendor_name: str = AT_VENDOR
     backup_command: str = 'Upload Method=tftp DestFile={SWITCH_NAME}-{BACKUP_DATE}.cfg Server={TFTP_SERVER} ' \
                           'srcFile=flash:boot.cfg '
