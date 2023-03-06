@@ -1,5 +1,6 @@
 import pexpect
 import logging
+from functools import wraps
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -13,6 +14,7 @@ class Switch:
         self.switch_name = switch_name
         self.switch_vendor = switch_vendor
         self.switch_context = None
+        self.authenticated = False
         self.switch_port = switch_port
 
         # Set vendor variables
@@ -25,6 +27,16 @@ class Switch:
         self.password_prompt = self.switch_vendor.password_prompt if self.switch_vendor.password_prompt else ''
         self.console_prompt = self.switch_vendor.console_prompt if self.switch_vendor.console_prompt else ''
         self.quit_command = self.switch_vendor.quit_command if self.switch_vendor.quit_command else ''
+
+    def check_authenticated(func):
+        @wraps(func)
+        def wrap(self, *args, **kwargs):
+            if self.authenticated:
+                return func(self, *args, **kwargs)
+            else:
+                logging.debug('Not authenticated...')
+                return
+        return wrap
 
     def __enter__(self):
         connection_command = None
@@ -39,16 +51,20 @@ class Switch:
             self.switch_context = pexpect.spawn(connection_command, timeout=30)
         except pexpect.exceptions.TIMEOUT:
             logging.error(f'Timeout exceeded to: {self.switch_name}')
+            return self
 
         # ----------------------------------------------------------------------------------------------
         if self.switch_service == SERVICE_TELNET_ACCESS:
             if not self.send_login_password(self.login_prompt, self.switch_username):
-                return
+                return self
 
         if not self.send_login_password(self.password_prompt, self.switch_password):
-            return
+            return self
 
-        self.wait_console_prompt()
+        if not self.wait_console_prompt():
+            return self
+
+        self.authenticated = True
         # ----------------------------------------------------------------------------------------------
         return self
 
@@ -58,51 +74,49 @@ class Switch:
             logging.debug('Connection closed...')
 
     def send_login_password(self, requested_prompt, custom_request) -> bool:
-        try:
-            return_prompt = self.switch_context.expect(requested_prompt)
-        except pexpect.exceptions.TIMEOUT:
-            logging.error(f'Error TIMEOUT interaction to: {self.switch_name}')
-            return False
-
-        if return_prompt == 0:
-            logging.debug(f'Requested_prompt: "{requested_prompt}"\nReturn: {self.switch_context.before}')
-
+        if self.wait_console_prompt(requested_prompt):
             logging.debug(f'Send Custom_request - {custom_request}')
             return_prompt = self.switch_context.sendline(custom_request)
-            logging.debug(f'\nReturn: {self.switch_context.before}')
             if return_prompt:
                 return True
         else:
             logging.error(f'Error interaction to: {self.switch_name}')
             return False
 
+    @check_authenticated
     def send_switch_backup_config(self, backup_command):
         logging.debug(f'Send switch backup config command: {backup_command}')
         self.switch_context.sendline(backup_command)
 
-        try:
-            if self.switch_context.expect(self.backup_success_message) == 0:
-                logging.info(f'SUCCESS backup config: {self.switch_name}')
-            else:
-                logging.warning(f'FAIL backup config: {self.switch_name}')
-        except pexpect.exceptions.TIMEOUT:
-            logging.error(f'TIMEOUT get console prompt: {self.console_prompt}')
-            return
+        if self.wait_console_prompt(self.backup_success_message):
+            logging.info(f'SUCCESS backup config: {self.switch_name}')
+        else:
+            logging.warning(f'FAIL backup config: {self.switch_name}')
 
         self.wait_console_prompt()
 
+    @check_authenticated
     def send_switch_command(self, switch_command):
         logging.debug(f'Send switch command: {switch_command}')
         self.switch_context.sendline(switch_command)
         self.wait_console_prompt()
 
-    def wait_console_prompt(self):
+    def wait_console_prompt(self, waiting_prompt='') -> bool:
+        console_prompt = waiting_prompt if waiting_prompt else self.console_prompt
+        logging.debug(f'wait_console_prompt: {console_prompt}')
         try:
-            if self.switch_context.expect(self.console_prompt) == 0:
+            if self.switch_context.expect(console_prompt) == 0:
                 logging.debug(f'\n----\n{self.switch_context.before}\n---\n')
-        except pexpect.exceptions.TIMEOUT:
-            logging.error(f'TIMEOUT get console prompt: {self.console_prompt}')
+                return True
+        except pexpect.exceptions.EOF:
+            logging.error(f'EOF get console prompt: {console_prompt}')
+            return False
 
+        except pexpect.exceptions.TIMEOUT:
+            logging.error(f'TIMEOUT get console prompt: {console_prompt}')
+            return False
+
+    @check_authenticated
     def switch_quit_command(self):
-        self.switch_context.sendline(self.quit_command)
         logging.debug(f'Switch quit command: {self.quit_command}')
+        self.switch_context.sendline(self.quit_command)

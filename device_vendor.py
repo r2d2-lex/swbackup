@@ -15,7 +15,6 @@ SSH_AT_CIPHER_OPTIONS = '-c aes256-cbc -oKexAlgorithms=+diffie-hellman-group1-sh
 SSH_OPTIONS = '-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'
 
 
-
 @dataclass()
 class BaseVendor:
     SERVICE_SSH_ACCESS = 'ssh'
@@ -65,10 +64,13 @@ class Huawei(BaseVendor):
 
 @dataclass
 class AlliedTelesis(BaseVendor):
+    username: str = config.USERNAME_AT
+    password: str = config.PASSWORD_AT
     console_options: str = f'{SSH_AT_CIPHER_OPTIONS} {SSH_OPTIONS}'
     vendor_name: str = AT_VENDOR
     backup_command: str = 'Upload Method=tftp DestFile={SWITCH_NAME}-{BACKUP_DATE}.cfg Server={TFTP_SERVER} ' \
                           'srcFile=flash:boot.cfg '
+    backup_success_message: str = '#' # temporarily
     service: str = BaseVendor.SERVICE_SSH_ACCESS
     base_words = (
         'Allied Telesis',
