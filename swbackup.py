@@ -26,6 +26,7 @@ def backup_over_console(switch_name, vendor):
     backup_command = vendor.make_backup_command(tftp_server, switch_name, get_date_time())
     with swSwitch.Switch(switch_name, vendor, 22, config.USERNAME, config.PASSWORD) as switch:
         switch.send_switch_backup_config(backup_command)
+        # switch.send_switch_command('display lldp neighbor brief')
         switch.switch_quit_command()
 
 

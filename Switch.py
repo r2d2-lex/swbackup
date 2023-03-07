@@ -1,4 +1,5 @@
 import pexpect
+import re
 import logging
 from functools import wraps
 
@@ -124,12 +125,26 @@ class Switch:
 
     @check_error
     def wait_console_prompt(self, waiting_prompt='') -> bool:
+        context_output = ''
         console_prompt = waiting_prompt if waiting_prompt else self.console_prompt
         logging.debug(f'wait_console_prompt: {console_prompt}')
         try:
-            if self.switch_context.expect(console_prompt) == 0:
-                logging.debug(f'\n----\n{self.switch_context.before}\n---\n')
-                return True
+            while True:
+                match = self.switch_context.expect([console_prompt, self.switch_vendor.space_wait])
+                page = self.switch_context.before
+                page = page.decode('utf-8')
+                page = page.replace("\r\n", "\n")
+                page = re.sub(" +\x08+ +\x08+", "\n", page)
+                context_output += page
+
+                if match == 0:
+                    break
+                elif match == 1:
+                    self.switch_context.send(" ")
+                else:
+                    raise pexpect.exceptions.TIMEOUT
+            logging.debug(f'\n----\n{context_output}\n---\n')
+            return True
         except pexpect.exceptions.EOF:
             logging.error(f'EOF get console prompt: {console_prompt}')
             return False

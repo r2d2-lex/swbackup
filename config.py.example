@@ -7,3 +7,5 @@ SERVICE_SSH_PORT = 22
 SERVICE_TELNET_PORT = 23
 SERVICE_TFTP_PORT = 161
 LOG_FILE = '/var/log/switch_backup.log'
+config.USERNAME_AT = 'username'
+config.PASSWORD_AT = 'password'

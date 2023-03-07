@@ -33,7 +33,7 @@ class BaseVendor:
     console_prompt: str = '[>#]'
     login_prompt: str = ''
     service: str = ''
-    space_wait: str = ''
+    space_wait: str = '---- More ----'
     password: str = ''
     password_prompt: str = '[Pp]assword:'
     tftp_server: str = ''
@@ -80,6 +80,8 @@ class AlliedTelesis(BaseVendor):
 
 @dataclass
 class AlliedWare(BaseVendor):
+    username: str = config.USERNAME_AT + '\r\n'
+    password: str = config.PASSWORD_AT + '\r\n'
     vendor_name: str = AW_VENDOR
     service: str = BaseVendor.SERVICE_TELNET_ACCESS
     login_prompt: str = '[Ll]ogin:'
