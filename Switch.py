@@ -15,6 +15,7 @@ class Switch:
         self.switch_vendor = switch_vendor
         self.switch_context = None
         self.authenticated = False
+        self.errors = False
         self.switch_port = switch_port
 
         # Set vendor variables
@@ -38,6 +39,16 @@ class Switch:
                 return
         return wrap
 
+    def check_error(func):
+        @wraps(func)
+        def wrap(self, *args, **kwargs):
+            if self.errors:
+                logging.debug('To more errors...')
+                return
+            else:
+                return func(self, *args, **kwargs)
+        return wrap
+
     def __enter__(self):
         connection_command = None
         if self.switch_service == SERVICE_SSH_ACCESS:
@@ -56,12 +67,15 @@ class Switch:
         # ----------------------------------------------------------------------------------------------
         if self.switch_service == SERVICE_TELNET_ACCESS:
             if not self.send_login_password(self.login_prompt, self.switch_username):
+                self.set_error_flag(f'get login prompt: {self.login_prompt} with Username: {self.switch_username}')
                 return self
 
         if not self.send_login_password(self.password_prompt, self.switch_password):
+            self.set_error_flag(f'get password prompt: {self.password_prompt}')
             return self
 
         if not self.wait_console_prompt():
+            self.set_error_flag(f'get console prompt: {self.console_prompt}')
             return self
 
         self.authenticated = True
@@ -73,16 +87,22 @@ class Switch:
             self.switch_context.close()
             logging.debug('Connection closed...')
 
+    def set_error_flag(self, error_string):
+        logging.error(error_string)
+        self.errors = True
+        return
+
+    @check_error
     def send_login_password(self, requested_prompt, custom_request) -> bool:
         if self.wait_console_prompt(requested_prompt):
             logging.debug(f'Send Custom_request - {custom_request}')
             return_prompt = self.switch_context.sendline(custom_request)
             if return_prompt:
                 return True
-        else:
-            logging.error(f'Error interaction to: {self.switch_name}')
-            return False
+        logging.error(f'Error interaction to: {self.switch_name}')
+        return False
 
+    @check_error
     @check_authenticated
     def send_switch_backup_config(self, backup_command):
         logging.debug(f'Send switch backup config command: {backup_command}')
@@ -95,12 +115,14 @@ class Switch:
 
         self.wait_console_prompt()
 
+    @check_error
     @check_authenticated
     def send_switch_command(self, switch_command):
         logging.debug(f'Send switch command: {switch_command}')
         self.switch_context.sendline(switch_command)
         self.wait_console_prompt()
 
+    @check_error
     def wait_console_prompt(self, waiting_prompt='') -> bool:
         console_prompt = waiting_prompt if waiting_prompt else self.console_prompt
         logging.debug(f'wait_console_prompt: {console_prompt}')
@@ -116,6 +138,7 @@ class Switch:
             logging.error(f'TIMEOUT get console prompt: {console_prompt}')
             return False
 
+    @check_error
     @check_authenticated
     def switch_quit_command(self):
         logging.debug(f'Switch quit command: {self.quit_command}')
