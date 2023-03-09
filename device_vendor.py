@@ -82,7 +82,7 @@ class AlliedTelesis(BaseVendor):
 class AlliedWare(BaseVendor):
     vendor_name: str = AW_VENDOR
     # Config filename size: 16 (max: 16 characters)
-    backup_command: str = 'copy flash tftp {TFTP_SERVER} {SWITCH_NAME}.cfg'
+    backup_command: str = 'copy flash tftp {TFTP_SERVER} {SWITCH_NAME}'
     backup_success_message: str = 'Copied'
     base_words = (
         'AlliedWare',
@@ -92,6 +92,17 @@ class AlliedWare(BaseVendor):
     username: str = config.USERNAME_AT + '\r\n'
     password: str = config.PASSWORD_AT + '\r\n'
     quit_command: str = 'exit'
+
+    @staticmethod
+    def generate_switch_config_name(switch_name):
+        result = switch_name
+        config_name = switch_name.split('.', 1)
+        try:
+            tmp = config_name[1]
+            result = config_name[0]
+        except IndexError:
+            pass
+        return f'{result}.cfg'
 
     def make_backup_command(self, tftp_server, switch_name, backup_date):
 

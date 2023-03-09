@@ -26,8 +26,8 @@ def backup_over_console(switch_name, vendor):
     backup_command = vendor.make_backup_command(tftp_server, switch_name, get_date_time())
     with swSwitch.Switch(switch_name, vendor, 22, config.USERNAME, config.PASSWORD) as switch:
         if vendor.vendor_name == AlliedWare.vendor_name:
-            logging.debug(AlliedWare.vendor_name)
-            config_name = f'{switch_name}.cfg'
+            config_name = vendor.generate_switch_config_name(switch_name)
+            logging.debug(f'AW config_name: "{config_name}"')
             switch.send_switch_command('enable')
             switch.send_switch_command(f'copy boot.cfg {config_name}')
             switch.send_switch_custom_command(backup_command, vendor.backup_success_message)
