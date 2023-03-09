@@ -105,16 +105,14 @@ class Switch:
 
     @check_error
     @check_authenticated
-    def send_switch_backup_config(self, backup_command):
-        logging.debug(f'Send switch backup config command: {backup_command}')
-        self.switch_context.sendline(backup_command)
+    def send_switch_custom_command(self, custom_command, waiting_prompt):
+        logging.debug(f'Send switch custom command: "{custom_command}" - waiting_prompt: "{waiting_prompt}"')
+        self.switch_context.sendline(custom_command)
 
-        if self.wait_console_prompt(self.backup_success_message):
-            logging.info(f'SUCCESS backup config: {self.switch_name}')
+        if self.wait_console_prompt(waiting_prompt):
+            logging.info(f'SUCCESS custom command: {custom_command}')
         else:
-            logging.warning(f'FAIL backup config: {self.switch_name}')
-
-        self.wait_console_prompt()
+            logging.warning(f'FAIL custom command: {custom_command}')
 
     @check_error
     @check_authenticated

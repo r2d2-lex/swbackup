@@ -1,4 +1,4 @@
-from device_vendor import detect_vendor, BaseVendor
+from device_vendor import detect_vendor, BaseVendor, AlliedWare
 import Switch as swSwitch
 import config
 import datetime
@@ -25,8 +25,20 @@ def backup_over_console(switch_name, vendor):
 
     backup_command = vendor.make_backup_command(tftp_server, switch_name, get_date_time())
     with swSwitch.Switch(switch_name, vendor, 22, config.USERNAME, config.PASSWORD) as switch:
-        switch.send_switch_backup_config(backup_command)
-        # switch.send_switch_command('display lldp neighbor brief')
+        if vendor.vendor_name == AlliedWare.vendor_name:
+            logging.debug(AlliedWare.vendor_name)
+            config_name = f'{switch_name}.cfg'
+            switch.send_switch_command('enable')
+            switch.send_switch_command(f'copy boot.cfg {config_name}')
+            switch.send_switch_custom_command(backup_command, vendor.backup_success_message)
+            switch.wait_console_prompt()
+            switch.send_switch_custom_command(f'delete {config_name}', '(y/n)')
+            switch.send_switch_custom_command('y\r\n', 'Deleting.....')
+            switch.wait_console_prompt()
+        else:
+            switch.send_switch_custom_command(backup_command, vendor.backup_success_message)
+            switch.wait_console_prompt()
+            # switch.send_switch_command('display lldp neighbor brief')
         switch.switch_quit_command()
 
 

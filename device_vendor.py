@@ -64,10 +64,10 @@ class Huawei(BaseVendor):
 
 @dataclass
 class AlliedTelesis(BaseVendor):
+    vendor_name: str = AT_VENDOR
     username: str = config.USERNAME_AT
     password: str = config.PASSWORD_AT
     console_options: str = f'{SSH_AT_CIPHER_OPTIONS} {SSH_OPTIONS}'
-    vendor_name: str = AT_VENDOR
     backup_command: str = 'Upload Method=tftp DestFile={SWITCH_NAME}-{BACKUP_DATE}.cfg Server={TFTP_SERVER} ' \
                           'srcFile=flash:boot.cfg '
     backup_success_message: str = '#' # temporarily
@@ -80,14 +80,24 @@ class AlliedTelesis(BaseVendor):
 
 @dataclass
 class AlliedWare(BaseVendor):
-    username: str = config.USERNAME_AT + '\r\n'
-    password: str = config.PASSWORD_AT + '\r\n'
     vendor_name: str = AW_VENDOR
-    service: str = BaseVendor.SERVICE_TELNET_ACCESS
-    login_prompt: str = '[Ll]ogin:'
+    # Config filename size: 16 (max: 16 characters)
+    backup_command: str = 'copy flash tftp {TFTP_SERVER} {SWITCH_NAME}.cfg'
+    backup_success_message: str = 'Copied'
     base_words = (
         'AlliedWare',
     )
+    login_prompt: str = '[Ll]ogin:'
+    service: str = BaseVendor.SERVICE_TELNET_ACCESS
+    username: str = config.USERNAME_AT + '\r\n'
+    password: str = config.PASSWORD_AT + '\r\n'
+    quit_command: str = 'exit'
+
+    def make_backup_command(self, tftp_server, switch_name, backup_date):
+
+        return self.backup_command.format(TFTP_SERVER=tftp_server,
+                                          SWITCH_NAME=switch_name,
+                                          )
 
 
 @dataclass
