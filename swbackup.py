@@ -1,4 +1,4 @@
-from device_vendor import detect_vendor, BaseVendor, AlliedWare
+from device_vendor import detect_vendor, BaseVendor, AlliedWare, CR_LF, HP
 import Switch as swSwitch
 import config
 import datetime
@@ -25,7 +25,15 @@ def backup_over_console(switch_name, vendor):
 
     backup_command = vendor.make_backup_command(tftp_server, switch_name, get_date_time())
     with swSwitch.Switch(switch_name, vendor, 22, config.USERNAME, config.PASSWORD) as switch:
-        if vendor.vendor_name == AlliedWare.vendor_name:
+        if vendor.vendor_name == HP.vendor_name:
+            switch.send_switch_custom_command('_cmdline-mode on', '[Y/N]')
+            switch.send_switch_custom_command('Y' + CR_LF, 'password:')
+            switch.send_switch_custom_command(HP.secret_password, 'Warning:')
+            switch.wait_console_prompt()
+            switch.send_switch_custom_command(backup_command, vendor.backup_success_message)
+            switch.wait_console_prompt()
+
+        elif vendor.vendor_name == AlliedWare.vendor_name:
             config_name = vendor.generate_switch_config_name(switch_name)
             logging.debug(f'AW config_name: "{config_name}"')
             switch.send_switch_command('enable')
@@ -33,7 +41,7 @@ def backup_over_console(switch_name, vendor):
             switch.send_switch_custom_command(backup_command, vendor.backup_success_message)
             switch.wait_console_prompt()
             switch.send_switch_custom_command(f'delete {config_name}', '(y/n)')
-            switch.send_switch_custom_command('y\r\n', 'Deleting.....')
+            switch.send_switch_custom_command('y'+CR_LF, 'Deleting.....')
             switch.wait_console_prompt()
         else:
             switch.send_switch_custom_command(backup_command, vendor.backup_success_message)

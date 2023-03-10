@@ -1,6 +1,7 @@
 import pexpect
 import re
 import logging
+from device_vendor import BaseVendor
 from functools import wraps
 
 logging.basicConfig(level=logging.DEBUG)
@@ -20,15 +21,15 @@ class Switch:
         self.switch_port = switch_port
 
         # Set vendor variables
-        self.switch_ssh_options = self.switch_vendor.console_options if self.switch_vendor.console_options else ''
+        self.switch_ssh_options = self.switch_vendor.console_options if self.switch_vendor.console_options else BaseVendor.console_options
         self.switch_username = self.switch_vendor.username if self.switch_vendor.username else switch_username
         self.switch_password = self.switch_vendor.password if self.switch_vendor.password else switch_password
-        self.switch_service = self.switch_vendor.service if self.switch_vendor.service else SERVICE_SSH_ACCESS
-        self.backup_success_message = self.switch_vendor.backup_success_message if self.switch_vendor.backup_success_message else ''
-        self.login_prompt = self.switch_vendor.login_prompt if self.switch_vendor.login_prompt else ''
-        self.password_prompt = self.switch_vendor.password_prompt if self.switch_vendor.password_prompt else ''
-        self.console_prompt = self.switch_vendor.console_prompt if self.switch_vendor.console_prompt else ''
-        self.quit_command = self.switch_vendor.quit_command if self.switch_vendor.quit_command else ''
+        self.switch_service = self.switch_vendor.service if self.switch_vendor.service else BaseVendor.service
+        self.backup_success_message = self.switch_vendor.backup_success_message if self.switch_vendor.backup_success_message else BaseVendor.backup_success_message
+        self.login_prompt = self.switch_vendor.login_prompt if self.switch_vendor.login_prompt else BaseVendor.login_prompt
+        self.password_prompt = self.switch_vendor.password_prompt if self.switch_vendor.password_prompt else BaseVendor.password_prompt
+        self.console_prompt = self.switch_vendor.console_prompt if self.switch_vendor.console_prompt else BaseVendor.console_prompt
+        self.quit_command = self.switch_vendor.quit_command if self.switch_vendor.quit_command else BaseVendor.quit_command
 
     def check_authenticated(func):
         @wraps(func)

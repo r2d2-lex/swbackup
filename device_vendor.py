@@ -12,7 +12,9 @@ HP_VENDOR = 'HP'
 T3COM_VENDOR = '3COM'
 VENDOR_OID = 'sysDescr'
 SSH_AT_CIPHER_OPTIONS = '-c aes256-cbc -oKexAlgorithms=+diffie-hellman-group1-sha1'
+SSH_HP_CIPHER_OPTIONS = '-c aes128-cbc -oKexAlgorithms=+diffie-hellman-group1-sha1'
 SSH_OPTIONS = '-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'
+CR_LF = '\r\n'
 
 
 @dataclass()
@@ -39,7 +41,7 @@ class BaseVendor:
     tftp_server: str = ''
     username: str = ''
     vendor_name: str = ''
-    quit_command: str = ''
+    quit_command: str = 'quit'
 
     def make_backup_command(self, tftp_server, switch_name, backup_date):
         return self.backup_command.format(TFTP_SERVER=tftp_server,
@@ -54,7 +56,6 @@ class Huawei(BaseVendor):
     backup_success_message: str = 'TFTP: Uploading the file successfully.'
     space_wait: str = '---- More ----'
     service: str = BaseVendor.SERVICE_SSH_ACCESS
-    quit_command: str = 'quit'
 
     base_words = (
         'Huawei',
@@ -89,8 +90,8 @@ class AlliedWare(BaseVendor):
     )
     login_prompt: str = '[Ll]ogin:'
     service: str = BaseVendor.SERVICE_TELNET_ACCESS
-    username: str = config.USERNAME_AT + '\r\n'
-    password: str = config.PASSWORD_AT + '\r\n'
+    username: str = config.USERNAME_AT + CR_LF
+    password: str = config.PASSWORD_AT + CR_LF
     quit_command: str = 'exit'
 
     @staticmethod
@@ -105,14 +106,36 @@ class AlliedWare(BaseVendor):
         return f'{result}.cfg'
 
     def make_backup_command(self, tftp_server, switch_name, backup_date):
-
         return self.backup_command.format(TFTP_SERVER=tftp_server,
-                                          SWITCH_NAME=switch_name,
+                                          SWITCH_NAME=self.generate_switch_config_name(switch_name),
                                           )
 
 
 @dataclass
 class HP(BaseVendor):
+    vendor_name: str = HP_VENDOR
+    backup_command: str = 'tftp {TFTP_SERVER2} put startup.cfg {SWITCH_NAME}-{BACKUP_DATE}.cfg'
+    backup_success_message: str = 'File uploaded successfully.'
+    service: str = BaseVendor.SERVICE_SSH_ACCESS
+    console_options: str = f'{SSH_HP_CIPHER_OPTIONS} {SSH_OPTIONS}'
+    username: str = config.USERNAME_HP
+    password: str = config.PASSWORD_HP
+    password_prompt: str = 'password:'
+    secret_password = 'Jinhua1920unauthorized' + CR_LF
+
+    base_words = (
+        '1920-48G',
+    )
+
+    def make_backup_command(self, tftp_server, switch_name, backup_date):
+        return self.backup_command.format(TFTP_SERVER2=tftp_server,
+                                          SWITCH_NAME=switch_name,
+                                          BACKUP_DATE=backup_date)
+
+
+
+@dataclass
+class HP_OC(BaseVendor):
     vendor_name: str = HP_VENDOR
     service: str = BaseVendor.SERVICE_TFTP_ACCESS
     base_words = (
@@ -128,7 +151,6 @@ class T3COM(BaseVendor):
     backup_command: str = 'tftp {TFTP_SERVER} put startup.cfg {SWITCH_NAME}-{BACKUP_DATE}.cfg'
     backup_success_message: str = 'File uploaded successfully.'
     login_prompt: str = 'Username:'
-    quit_command: str = 'quit'
     tftp_server: str = config.TFTP_SERVER2
     base_words = (
         '3Com',
