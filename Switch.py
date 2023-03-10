@@ -9,6 +9,8 @@ logging.basicConfig(level=logging.DEBUG)
 SERVICE_SSH_ACCESS = 'ssh'
 SERVICE_TELNET_ACCESS = 'telnet'
 SERVICE_TFTP_ACCESS = 'tftp'
+REQUIRED_PROMPT = True
+NOT_REQUIRED_PROMPT = False
 
 
 class Switch:
@@ -106,7 +108,7 @@ class Switch:
 
     @check_error
     @check_authenticated
-    def send_switch_custom_command(self, custom_command, waiting_prompt):
+    def send_switch_custom_command(self, custom_command, waiting_prompt, required_prompt):
         logging.debug(f'Send switch custom command: "{custom_command}" - waiting_prompt: "{waiting_prompt}"')
         self.switch_context.sendline(custom_command)
 
@@ -114,6 +116,9 @@ class Switch:
             logging.info(f'SUCCESS custom command: {custom_command}')
         else:
             logging.warning(f'FAIL custom command: {custom_command}')
+
+        if required_prompt:
+            self.wait_console_prompt()
 
     @check_error
     @check_authenticated

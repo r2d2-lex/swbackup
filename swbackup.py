@@ -1,5 +1,5 @@
-from device_vendor import detect_vendor, BaseVendor, AlliedWare, CR_LF, HP
-import Switch as swSwitch
+from device_vendor import *
+from Switch import *
 import config
 import datetime
 import logging
@@ -24,28 +24,23 @@ def backup_over_console(switch_name, vendor):
         tftp_server = vendor.tftp_server
 
     backup_command = vendor.make_backup_command(tftp_server, switch_name, get_date_time())
-    with swSwitch.Switch(switch_name, vendor, 22, config.USERNAME, config.PASSWORD) as switch:
+    with Switch(switch_name, vendor, 22, config.USERNAME, config.PASSWORD) as switch:
         if vendor.vendor_name == HP.vendor_name:
-            switch.send_switch_custom_command('_cmdline-mode on', '[Y/N]')
-            switch.send_switch_custom_command('Y', 'password:')
-            switch.send_switch_custom_command(HP.secret_password, 'Warning:')
-            switch.wait_console_prompt()
-            switch.send_switch_custom_command(backup_command, vendor.backup_success_message)
-            switch.wait_console_prompt()
+            switch.send_switch_custom_command('_cmdline-mode on', '[Y/N]', NOT_REQUIRED_PROMPT)
+            switch.send_switch_custom_command('Y', 'password:', NOT_REQUIRED_PROMPT)
+            switch.send_switch_custom_command(HP.secret_password, 'Warning:', REQUIRED_PROMPT)
+            switch.send_switch_custom_command(backup_command, vendor.backup_success_message, REQUIRED_PROMPT)
 
         elif vendor.vendor_name == AlliedWare.vendor_name:
             config_name = vendor.generate_switch_config_name(switch_name)
             logging.debug(f'AW config_name: "{config_name}"')
             switch.send_switch_command('enable')
             switch.send_switch_command(f'copy boot.cfg {config_name}')
-            switch.send_switch_custom_command(backup_command, vendor.backup_success_message)
-            switch.wait_console_prompt()
-            switch.send_switch_custom_command(f'delete {config_name}', '(y/n)')
-            switch.send_switch_custom_command('y'+CR_LF, 'Deleting.....')
-            switch.wait_console_prompt()
+            switch.send_switch_custom_command(backup_command, vendor.backup_success_message, REQUIRED_PROMPT)
+            switch.send_switch_custom_command(f'delete {config_name}', '(y/n)', NOT_REQUIRED_PROMPT)
+            switch.send_switch_custom_command('y'+CR_LF, 'Deleting.....', REQUIRED_PROMPT)
         else:
-            switch.send_switch_custom_command(backup_command, vendor.backup_success_message)
-            switch.wait_console_prompt()
+            switch.send_switch_custom_command(backup_command, vendor.backup_success_message, REQUIRED_PROMPT)
             # switch.send_switch_command('display lldp neighbor brief')
         switch.switch_quit_command()
 
