@@ -38,7 +38,7 @@ class BaseVendor:
     space_wait: str = '---- More ----'
     password: str = ''
     password_prompt: str = '[Pp]assword:'
-    tftp_server: str = ''
+    tftp_server: str = config.TFTP_SERVER
     username: str = ''
     vendor_name: str = ''
     quit_command: str = 'quit'
@@ -114,24 +114,19 @@ class AlliedWare(BaseVendor):
 @dataclass
 class HP(BaseVendor):
     vendor_name: str = HP_VENDOR
-    backup_command: str = 'tftp {TFTP_SERVER2} put startup.cfg {SWITCH_NAME}-{BACKUP_DATE}.cfg'
+    backup_command: str = 'tftp {TFTP_SERVER} put startup.cfg {SWITCH_NAME}-{BACKUP_DATE}.cfg'
     backup_success_message: str = 'File uploaded successfully.'
     service: str = BaseVendor.SERVICE_SSH_ACCESS
     console_options: str = f'{SSH_HP_CIPHER_OPTIONS} {SSH_OPTIONS}'
     username: str = config.USERNAME_HP
     password: str = config.PASSWORD_HP
     password_prompt: str = 'password:'
-    secret_password = 'Jinhua1920unauthorized' + CR_LF
+    secret_password = 'Jinhua1920unauthorized'
+    tftp_server: str = config.TFTP_SERVER2
 
     base_words = (
         '1920-48G',
     )
-
-    def make_backup_command(self, tftp_server, switch_name, backup_date):
-        return self.backup_command.format(TFTP_SERVER2=tftp_server,
-                                          SWITCH_NAME=switch_name,
-                                          BACKUP_DATE=backup_date)
-
 
 
 @dataclass

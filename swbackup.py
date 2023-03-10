@@ -27,7 +27,7 @@ def backup_over_console(switch_name, vendor):
     with swSwitch.Switch(switch_name, vendor, 22, config.USERNAME, config.PASSWORD) as switch:
         if vendor.vendor_name == HP.vendor_name:
             switch.send_switch_custom_command('_cmdline-mode on', '[Y/N]')
-            switch.send_switch_custom_command('Y' + CR_LF, 'password:')
+            switch.send_switch_custom_command('Y', 'password:')
             switch.send_switch_custom_command(HP.secret_password, 'Warning:')
             switch.wait_console_prompt()
             switch.send_switch_custom_command(backup_command, vendor.backup_success_message)
