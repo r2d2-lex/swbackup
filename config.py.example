@@ -1,4 +1,7 @@
+import logging
+
 TFTP_SERVER = '127.0.0.1'
+TFTP_SERVER2 = '10.20.30.77'
 USERNAME = 'username'
 PASSWORD = 'password'
 SWITCHES_FILE = 'switches.cfg'
@@ -7,5 +10,9 @@ SERVICE_SSH_PORT = 22
 SERVICE_TELNET_PORT = 23
 SERVICE_TFTP_PORT = 161
 LOG_FILE = '/var/log/switch_backup.log'
-config.USERNAME_AT = 'username'
-config.PASSWORD_AT = 'password'
+USERNAME_AT = 'username'
+PASSWORD_AT = 'password'
+USERNAME_HP =  'username'
+PASSWORD_HP =  'password'
+LOGGING_LEVEL = logging.DEBUG
+LOGGING_LEVEL = ''

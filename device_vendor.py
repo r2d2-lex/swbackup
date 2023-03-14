@@ -3,7 +3,8 @@ import snmp
 import config
 import logging
 
-logging.basicConfig(level=logging.DEBUG)
+logging_level = config.LOGGING_LEVEL if config.LOGGING_LEVEL else logging.DEBUG
+logging.basicConfig(level=logging_level)
 
 HUAWEI_VENDOR = 'Huawei'
 AT_VENDOR = 'AlliedTelesis'

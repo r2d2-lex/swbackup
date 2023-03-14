@@ -1,10 +1,13 @@
+import config
 import pexpect
 import re
 import logging
 from device_vendor import BaseVendor
 from functools import wraps
+import logging
 
-logging.basicConfig(level=logging.DEBUG)
+logging_level = config.LOGGING_LEVEL if config.LOGGING_LEVEL else logging.DEBUG
+logging.basicConfig(level=logging_level)
 
 SERVICE_SSH_ACCESS = 'ssh'
 SERVICE_TELNET_ACCESS = 'telnet'
