@@ -5,8 +5,7 @@ import datetime
 import logging
 
 # logging.basicConfig(level=logging.CRITICAL, filename=config.LOG_FILE, filemode='w')
-logging_level = config.LOGGING_LEVEL if config.LOGGING_LEVEL else logging.DEBUG
-logging.basicConfig(level=logging_level)
+logging.basicConfig(level=config.LOGGING_LEVEL)
 
 
 def get_date_time():
