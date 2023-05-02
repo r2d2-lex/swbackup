@@ -21,11 +21,13 @@ CR_LF = '\r\n'
 class BaseVendor:
     SERVICE_SSH_ACCESS = 'ssh'
     SERVICE_TELNET_ACCESS = 'telnet'
-    SERVICE_TFTP_ACCESS = 'tftp'
+    SERVICE_SNMP_ACCESS = 'snmp'
+    SERVICE_HTTP_ACCESS = 'http'
     ALL_BACKUP_SERVICES = (
         SERVICE_SSH_ACCESS,
         SERVICE_TELNET_ACCESS,
-        SERVICE_TFTP_ACCESS,
+        SERVICE_SNMP_ACCESS,
+        SERVICE_HTTP_ACCESS,
     )
 
     backup_command: str = ''
@@ -132,7 +134,7 @@ class HP(BaseVendor):
 @dataclass
 class HP_OC(BaseVendor):
     vendor_name: str = HP_VENDOR
-    service: str = BaseVendor.SERVICE_TFTP_ACCESS
+    service: str = BaseVendor.SERVICE_HTTP_ACCESS
     base_words = (
         'HPE OfficeConnect',
         '1820 48G J9981A',

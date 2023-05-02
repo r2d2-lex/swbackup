@@ -45,7 +45,11 @@ def backup_over_console(switch_name, vendor):
         switch.switch_quit_command()
 
 
-def backup_over_tftp(switch_name, vendor):
+def backup_over_snmp(switch_name, vendor):
+    pass
+
+
+def backup_over_http(switch_name, vendor):
     pass
 
 
@@ -59,8 +63,11 @@ def backup_tftp_config(switch_name):
         if vendor.service == BaseVendor.SERVICE_TELNET_ACCESS:
             backup_over_console(switch_name, vendor)
 
-        if vendor.service == BaseVendor.SERVICE_TFTP_ACCESS:
-            backup_over_tftp(switch_name, vendor)
+        if vendor.service == BaseVendor.SERVICE_SNMP_ACCESS:
+            backup_over_snmp(switch_name, vendor)
+
+        if vendor.service == BaseVendor.SERVICE_HTTP_ACCESS:
+            backup_over_http(switch_name, vendor)
 
     else:
         logging.warning(f'Fail backup {switch_name}')
