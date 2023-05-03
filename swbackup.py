@@ -36,7 +36,6 @@ def detect_tftp_server(switch_name, tftp_servers):
 
     for server in tftp_servers:
         server_ip = socket.gethostbyname(server)
-        logging.info(f'TFTP IP: {server_ip}')
         tftp_octets = server_ip.split('.', 4)
         if compare_octets(switch_octets , tftp_octets):
             return server_ip

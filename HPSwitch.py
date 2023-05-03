@@ -63,7 +63,7 @@ class HPSwitch:
 
         try:
             file_upload_result = self.session.post(self.file_upload_ajax, data=file_transfer_fields)
-            print(f'Status code of url {self.file_upload_ajax}: {file_upload_result.status_code}')
+            logging.debug(f'Status code of url {self.file_upload_ajax}: {file_upload_result.status_code}')
             if file_upload_result.status_code == 200:
 
                 try:
@@ -81,7 +81,7 @@ class HPSwitch:
                                 logging.debug(f'status_json: {status_json}')
                                 if self.TRANSFER_STATUS in status_json:
                                     result = str(status_json[self.TRANSFER_STATUS])
-                                    logging.info(f'Результат передачи: {result}')
+                                    logging.debug(f'Результат передачи: {result}')
                                     return result
                         else:
                             logging.info(f'Error backup config: {result_json[self.ERROR_MESSAGES_UPLOAD_RESPONSE]}')
