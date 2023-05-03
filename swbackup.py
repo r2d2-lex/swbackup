@@ -1,5 +1,6 @@
 from device_vendor import *
 from Switch import *
+from HPSwitch import HPSwitch
 import config
 import datetime
 import logging
@@ -50,7 +51,20 @@ def backup_over_snmp(switch_name, vendor):
 
 
 def backup_over_http(switch_name, vendor):
-    pass
+    config_name = switch_name + '-' + get_date_time() + '.cfg'
+    if vendor.vendor_name == HP_OC.vendor_name:
+        with HPSwitch(switch_name,
+                      config.USERNAME,
+                      config.PASSWORD,
+                      config.TFTP_SERVER2,
+                      config_name,
+                      ) as switch:
+            status = switch.upload_to_tftp()
+            if status:
+                message = f'Success upload config {config_name} on {config.TFTP_SERVER}'
+            else:
+                message = f'Error upload config {config_name} on {config.TFTP_SERVER}'
+            logging.info(message)
 
 
 def backup_tftp_config(switch_name):

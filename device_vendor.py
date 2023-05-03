@@ -9,6 +9,7 @@ HUAWEI_VENDOR = 'Huawei'
 AT_VENDOR = 'AlliedTelesis'
 AW_VENDOR = 'AlliedWare'
 HP_VENDOR = 'HP'
+HP_OC_VENDOR = 'HP_OC'
 T3COM_VENDOR = '3COM'
 VENDOR_OID = 'sysDescr'
 SSH_AT_CIPHER_OPTIONS = '-c aes256-cbc -oKexAlgorithms=+diffie-hellman-group1-sha1'
@@ -133,7 +134,7 @@ class HP(BaseVendor):
 
 @dataclass
 class HP_OC(BaseVendor):
-    vendor_name: str = HP_VENDOR
+    vendor_name: str = HP_OC_VENDOR
     service: str = BaseVendor.SERVICE_HTTP_ACCESS
     base_words = (
         'HPE OfficeConnect',
@@ -154,7 +155,7 @@ class T3COM(BaseVendor):
     )
 
 
-ALL_DEVICE_VENDORS = (Huawei, AlliedTelesis, HP, T3COM, AlliedWare)
+ALL_DEVICE_VENDORS = (Huawei, AlliedTelesis, HP, T3COM, AlliedWare, HP_OC)
 
 
 def search_vendor_word(vendor_value):
@@ -183,6 +184,8 @@ def search_vendor_word(vendor_value):
         result = HP()
     if vendor_word == T3COM_VENDOR:
         result = T3COM()
+    if vendor_word == HP_OC_VENDOR:
+        result = HP_OC()
     return result
 
 
