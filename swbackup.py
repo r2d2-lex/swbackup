@@ -4,9 +4,44 @@ from HPSwitch import HPSwitch
 import config
 import datetime
 import logging
+import socket
 
 # logging.basicConfig(level=logging.CRITICAL, filename=config.LOG_FILE, filemode='w')
 logging.basicConfig(level=config.LOGGING_LEVEL)
+
+
+def compare_octets(switch_octets , tftp_octets):
+    """
+        Сравнивает 3 первых октета tftp сервера с октетами свитча
+    """
+    compare = False
+    octet_index = 0
+    for sw_octet in switch_octets:
+        if octet_index == 3:
+            compare = True
+            break
+        if sw_octet == tftp_octets[octet_index]:
+            octet_index += 1
+            continue
+        break
+    return compare
+
+
+def detect_tftp_server(switch_name, tftp_servers):
+    tftp_ip = BaseVendor.tftp_server
+
+    switch_ip = socket.gethostbyname(switch_name)
+    logging.info(f'Swith IP: {switch_ip}')
+    switch_octets = switch_ip.split('.', 4)
+
+    for server in tftp_servers:
+        server_ip = socket.gethostbyname(server)
+        logging.info(f'TFTP IP: {server_ip}')
+        tftp_octets = server_ip.split('.', 4)
+        if compare_octets(switch_octets , tftp_octets):
+            return server_ip
+
+    return tftp_ip
 
 
 def get_date_time():
@@ -20,9 +55,7 @@ def open_switch_filename(filename):
 
 
 def backup_over_console(switch_name, vendor):
-    tftp_server = config.TFTP_SERVER
-    if vendor.tftp_server:
-        tftp_server = vendor.tftp_server
+    tftp_server = detect_tftp_server(switch_name, config.TFTP_SERVERS)
 
     backup_command = vendor.make_backup_command(tftp_server, switch_name, get_date_time())
     with Switch(switch_name, vendor, 22, config.USERNAME, config.PASSWORD) as switch:
@@ -51,12 +84,13 @@ def backup_over_snmp(switch_name, vendor):
 
 
 def backup_over_http(switch_name, vendor):
+    tftp_server = detect_tftp_server(switch_name, config.TFTP_SERVERS)
     config_name = switch_name + '-' + get_date_time() + '.cfg'
     if vendor.vendor_name == HP_OC.vendor_name:
         with HPSwitch(switch_name,
                       config.USERNAME,
                       config.PASSWORD,
-                      config.TFTP_SERVER2,
+                      tftp_server,
                       config_name,
                       ) as switch:
             status = switch.upload_to_tftp()
