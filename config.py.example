@@ -16,3 +16,4 @@ USERNAME_HP =  'username'
 PASSWORD_HP =  'password'
 LOGGING_LEVEL = logging.DEBUG
 TFTP_SERVERS = [TFTP_SERVER, TFTP_SERVER2]
+SNMP_GET_COMMAND = '/usr/bin/snmpget'

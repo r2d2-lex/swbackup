@@ -1,5 +1,6 @@
 from dataclasses import dataclass
-import snmp
+#import snmp
+from snmp2 import *
 import config
 import logging
 
@@ -191,7 +192,8 @@ def search_vendor_word(vendor_value):
 
 def detect_snmp_vendor(device_name):
     vendor = ''
-    vendor_value = snmp.snmp_get(device_name, config.SNMP_COMMUNITY, VENDOR_OID)
+    # vendor_value = snmp.snmp_get(device_name, config.SNMP_COMMUNITY, VENDOR_OID)
+    vendor_value = snmp_get_description(device_name)
     if vendor_value:
         vendor = search_vendor_word(vendor_value)
         if vendor:
