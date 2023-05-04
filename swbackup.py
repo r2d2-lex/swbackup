@@ -18,22 +18,28 @@ def compare_octets(switch_octets , tftp_octets):
     for sw_octet in switch_octets:
         if octet_index == 3:
             return True
-        if sw_octet == tftp_octets[octet_index]:
-            octet_index += 1
-            continue
+        try:
+            if sw_octet == tftp_octets[octet_index]:
+                octet_index += 1
+                continue
+        except(IndexError, KeyError):
+            logging.info('Data error')
         return
 
 
 def detect_tftp_server(switch_name, tftp_servers):
     tftp_ip = BaseVendor.tftp_server
-    switch_ip = socket.gethostbyname(switch_name)
-    logging.info(f'Swith IP: {switch_ip}')
-    switch_octets = switch_ip.split('.', 4)
-    for server in tftp_servers:
-        server_ip = socket.gethostbyname(server)
-        tftp_octets = server_ip.split('.', 4)
-        if compare_octets(switch_octets , tftp_octets):
-            return server_ip
+    try:
+        switch_ip = socket.gethostbyname(switch_name)
+        logging.info(f'Swith IP: {switch_ip}')
+        switch_octets = switch_ip.split('.', 4)
+        for server in tftp_servers:
+            server_ip = socket.gethostbyname(server)
+            tftp_octets = server_ip.split('.', 4)
+            if compare_octets(switch_octets , tftp_octets):
+                return server_ip
+    except socket.gaierror as error:
+        logging.info(error)
     return tftp_ip
 
 
