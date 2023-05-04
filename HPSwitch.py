@@ -15,6 +15,8 @@ class HPSwitch:
     CPU_STRING = 'id="cpu_util_prog_bar_val">'
     MEMORY_STRING = 'id="mem_util_prog_bar_val">'
     TRANSFER_STATUS = 'xferStatus'
+    TRANSFER_STATUS_SUCCESS = 1
+    TRANSFER_STATUS_SUCCESS2 = 10
 
     def __init__(self, switch_name, switch_username, switch_password, tftp_server, config_filename):
         self.switch_name = switch_name
@@ -80,9 +82,12 @@ class HPSwitch:
                                 status_json = file_transfer_status.json()
                                 logging.debug(f'status_json: {status_json}')
                                 if self.TRANSFER_STATUS in status_json:
-                                    result = str(status_json[self.TRANSFER_STATUS])
+                                    result = int(status_json[self.TRANSFER_STATUS])
                                     logging.debug(f'Результат передачи: {result}')
-                                    return result
+
+                                    if result == self.TRANSFER_STATUS_SUCCESS or result == self.TRANSFER_STATUS_SUCCESS2:
+                                        return result
+                                    return
                         else:
                             logging.info(f'Error backup config: {result_json[self.ERROR_MESSAGES_UPLOAD_RESPONSE]}')
                 except (ValueError, KeyError):
