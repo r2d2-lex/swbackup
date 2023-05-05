@@ -88,9 +88,9 @@ class Switch:
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
+        logging.debug(f'Connection closed for {self.switch_name}...')
         if self.switch_context:
             self.switch_context.close()
-            logging.debug('Connection closed...')
 
     def set_error_flag(self, error_string):
         logging.error(error_string)

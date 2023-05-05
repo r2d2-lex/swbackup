@@ -6,8 +6,11 @@ import datetime
 import logging
 import socket
 
-# logging.basicConfig(level=logging.CRITICAL, filename=config.LOG_FILE, filemode='w')
-logging.basicConfig(level=config.LOGGING_LEVEL)
+logging.basicConfig(level=logging.INFO)
+fh = logging.FileHandler(config.LOG_FILE)
+formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
+fh.setFormatter(formatter)
+logging.root.addHandler(fh)
 
 
 def compare_octets(switch_octets , tftp_octets):
@@ -118,6 +121,7 @@ def backup_tftp_config(switch_name):
 
     else:
         logging.warning(f'Fail backup {switch_name}')
+    logging.info(f'End backup of {switch_name}...\r\n')
 
 
 def main():
