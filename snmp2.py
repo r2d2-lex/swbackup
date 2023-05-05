@@ -5,7 +5,9 @@ oidSysDescr = 'iso.3.6.1.2.1.1.1.0'
 HEX_STRING = 'Hex-STRING: '
 
 
-def check_hex_string(string) -> str:
+def check_hex_string(string: str) -> str:
+    if not isinstance(string, str):
+        raise TypeError
     if HEX_STRING in string:
         try:
             str_modify = string.split(HEX_STRING, 1)[1]
