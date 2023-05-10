@@ -7,10 +7,11 @@ import logging
 import socket
 
 logging.basicConfig(level=logging.INFO)
-fh = logging.FileHandler(config.LOG_FILE)
-formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
-fh.setFormatter(formatter)
-logging.root.addHandler(fh)
+if config.LOG_FILE:
+    fh = logging.FileHandler(config.LOG_FILE)
+    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
+    fh.setFormatter(formatter)
+    logging.root.addHandler(fh)
 
 
 def compare_octets(switch_octets , tftp_octets):

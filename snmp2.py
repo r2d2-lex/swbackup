@@ -11,9 +11,10 @@ def check_hex_string(string: str) -> str:
     if HEX_STRING in string:
         try:
             str_modify = string.split(HEX_STRING, 1)[1]
-            str_modify = ''.join(str_modify.split())
-            return bytes.fromhex(str_modify).decode('latin-1')
-        except (ValueError, IndexError):
+            result = bytes.fromhex(str_modify).decode('latin-1')
+            result = ' '.join(result.split())
+            return result
+        except (ValueError, TypeError):
             pass
     return string
 
@@ -32,3 +33,8 @@ def snmp_get_description(switch: str):
     except TypeError:
         result = f'Fail command: {snmp_command}'
     return result
+
+
+if __name__ == "__main__":
+    arg = 'Hex-STRING: '
+    print(check_hex_string(arg))
