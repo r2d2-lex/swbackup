@@ -1,1 +1,2 @@
-*  */3  * * *   root    /usr/bin/env bash -c 'cd /scripts/swbackup/ && source /scripts/swbackup/venv/bin/activate && /scripts/swbackup/venv/bin/python /scripts/swbackup/swbackup.py > /dev/null 2>&1'
+# Каждый третий день
+*  *  */3 * *   root    /usr/bin/env bash -c 'cd /scripts/swbackup/ && source /scripts/swbackup/venv/bin/activate && /scripts/swbackup/venv/bin/python /scripts/swbackup/swbackup.py > /dev/null 2>&1'
