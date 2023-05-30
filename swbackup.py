@@ -1,7 +1,8 @@
 import datetime
 import socket
 import sys
-import threading
+import time
+from multiprocessing.pool import ThreadPool
 
 from device_vendor import *
 from Switch import *
@@ -11,6 +12,9 @@ import config
 from loguru import logger as logging
 logging.remove(0)
 logging.add(sys.stderr, level=config.LOGGING_LEVEL)
+
+# Кол-во одновременных backup - заданий
+THREAD_COUNT = 4
 
 
 def compare_octets(switch_octets , tftp_octets):
@@ -127,21 +131,12 @@ def backup_tftp_config(switch_name):
 def main():
     logging.info(f'Backup switches configuration on TFTP: {config.TFTP_SERVER}')
     switches = open_switch_filename(config.SWITCHES_FILE)
-    threads = []
+    time_start = time.time()
     if switches:
-        for switch in switches:
-            arg = (switch, )
-            thread = threading.Thread(
-                target=backup_tftp_config,
-                args=arg,
-            )
-            thread.start()
-            threads.append(thread)
-
-        for tread in threads:
-            tread.join()
-
-    logging.info('Finished backup commutators !!!')
+        pool = ThreadPool(THREAD_COUNT)
+        pool.map(backup_tftp_config, switches)
+    time_end = time.time()
+    logging.info('Finished backup of commutators in {:.3f} seconds !!!', time_end - time_start)
 
 
 if __name__ == '__main__':
