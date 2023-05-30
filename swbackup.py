@@ -1,17 +1,16 @@
+import datetime
+import socket
+import sys
+import threading
+
 from device_vendor import *
 from Switch import *
 from HPSwitch import HPSwitch
 import config
-import datetime
-import logging
-import socket
 
-logging.basicConfig(level=logging.INFO)
-if config.LOG_FILE:
-    fh = logging.FileHandler(config.LOG_FILE)
-    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
-    fh.setFormatter(formatter)
-    logging.root.addHandler(fh)
+from loguru import logger as logging
+logging.remove(0)
+logging.add(sys.stderr, level=config.LOGGING_LEVEL)
 
 
 def compare_octets(switch_octets , tftp_octets):
@@ -128,11 +127,21 @@ def backup_tftp_config(switch_name):
 def main():
     logging.info(f'Backup switches configuration on TFTP: {config.TFTP_SERVER}')
     switches = open_switch_filename(config.SWITCHES_FILE)
+    threads = []
     if switches:
         for switch in switches:
-            backup_tftp_config(switch)
-            print('\n')
-            # input('Press any key...')
+            arg = (switch, )
+            thread = threading.Thread(
+                target=backup_tftp_config,
+                args=arg,
+            )
+            thread.start()
+            threads.append(thread)
+
+        for tread in threads:
+            tread.join()
+
+    logging.info('Finished backup commutators !!!')
 
 
 if __name__ == '__main__':

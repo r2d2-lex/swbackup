@@ -1,11 +1,9 @@
-import config
 import pexpect
 import re
 from device_vendor import BaseVendor
 from functools import wraps
-import logging
 
-logging.basicConfig(level=config.LOGGING_LEVEL)
+from loguru import logger as logging
 
 SERVICE_SSH_ACCESS = 'ssh'
 SERVICE_TELNET_ACCESS = 'telnet'

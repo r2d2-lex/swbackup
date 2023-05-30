@@ -1,5 +1,3 @@
-import logging
-
 TFTP_SERVER = '127.0.0.1'
 TFTP_SERVER2 = '10.20.30.77'
 USERNAME = 'username'
@@ -14,6 +12,6 @@ USERNAME_AT = 'username'
 PASSWORD_AT = 'password'
 USERNAME_HP =  'username'
 PASSWORD_HP =  'password'
-LOGGING_LEVEL = logging.DEBUG
+LOGGING_LEVEL = 'INFO'
 TFTP_SERVERS = [TFTP_SERVER, TFTP_SERVER2]
 SNMP_GET_COMMAND = '/usr/bin/snmpget'

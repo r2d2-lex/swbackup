@@ -2,11 +2,10 @@
     Класс для коммутатора HPE Office Connect 1820
 """
 from functools import wraps
-import logging
 import requests
 import config
 
-logging.basicConfig(level=logging.INFO)
+from loguru import logger as logging
 
 
 class HPSwitch:

@@ -1,10 +1,8 @@
 from dataclasses import dataclass
-#import snmp
 from snmp2 import *
 import config
-import logging
 
-logging.basicConfig(level=config.LOGGING_LEVEL)
+from loguru import logger as logging
 
 HUAWEI_VENDOR = 'Huawei'
 AT_VENDOR = 'AlliedTelesis'
