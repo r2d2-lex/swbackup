@@ -90,13 +90,13 @@ class Switch:
         if self.switch_context:
             self.switch_context.close()
 
-    def set_error_flag(self, error_string):
+    def set_error_flag(self, error_string: str):
         logging.error(error_string)
         self.errors = True
         return
 
     @check_error
-    def send_login_password(self, requested_prompt, custom_request) -> bool:
+    def send_login_password(self, requested_prompt: str, custom_request: str) -> bool:
         if self.wait_console_prompt(requested_prompt):
             logging.debug(f'Send Custom_request - {custom_request}')
             return_prompt = self.switch_context.sendline(custom_request)
@@ -107,7 +107,7 @@ class Switch:
 
     @check_error
     @check_authenticated
-    def send_switch_custom_command(self, custom_command, waiting_prompt, required_prompt):
+    def send_switch_custom_command(self, custom_command: str, waiting_prompt: str, required_prompt: bool) -> None:
         logging.debug(f'Send switch custom command: "{custom_command}" - waiting_prompt: "{waiting_prompt}"')
         self.switch_context.sendline(custom_command)
 
@@ -121,13 +121,13 @@ class Switch:
 
     @check_error
     @check_authenticated
-    def send_switch_command(self, switch_command):
+    def send_switch_command(self, switch_command: str) -> None:
         logging.debug(f'Send switch command: {switch_command}')
         self.switch_context.sendline(switch_command)
         self.wait_console_prompt()
 
     @check_error
-    def wait_console_prompt(self, waiting_prompt='') -> bool:
+    def wait_console_prompt(self, waiting_prompt: str = '') -> bool:
         context_output = ''
         console_prompt = waiting_prompt if waiting_prompt else self.console_prompt
         logging.debug(f'wait_console_prompt: {console_prompt}')
@@ -158,6 +158,6 @@ class Switch:
 
     @check_error
     @check_authenticated
-    def switch_quit_command(self):
+    def switch_quit_command(self)  -> None:
         logging.debug(f'Switch quit command: {self.quit_command}')
         self.switch_context.sendline(self.quit_command)

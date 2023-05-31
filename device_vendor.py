@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Union
 from snmp2 import *
 import config
 
@@ -154,12 +155,12 @@ class T3COM(BaseVendor):
     )
 
 
-ALL_DEVICE_VENDORS = (Huawei, AlliedTelesis, HP, T3COM, AlliedWare, HP_OC)
+ALL_DEVICE_VENDORS = (Huawei, AlliedTelesis, HP, T3COM, AlliedWare, HP_OC, None)
 
 
-def search_vendor_word(vendor_value):
+def search_vendor_word(vendor_value) -> Union[ALL_DEVICE_VENDORS]:
     vendor_word = ''
-    result = ''
+    result = None
 
     vendor_value = vendor_value.lower()
     vendor_value = ' '.join(vendor_value.split())
@@ -188,7 +189,7 @@ def search_vendor_word(vendor_value):
     return result
 
 
-def detect_snmp_vendor(device_name):
+def detect_snmp_vendor(device_name: str) -> Union[ALL_DEVICE_VENDORS]:
     vendor = ''
     # vendor_value = snmp.snmp_get(device_name, config.SNMP_COMMUNITY, VENDOR_OID)
     vendor_value = snmp_get_description(device_name)
@@ -199,5 +200,5 @@ def detect_snmp_vendor(device_name):
     return vendor
 
 
-def detect_vendor(device_name):
+def detect_vendor(device_name: str) -> Union[ALL_DEVICE_VENDORS]:
     return detect_snmp_vendor(device_name)

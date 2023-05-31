@@ -17,7 +17,7 @@ logging.add(sys.stderr, level=config.LOGGING_LEVEL)
 THREAD_COUNT = 4
 
 
-def compare_octets(switch_octets , tftp_octets):
+def compare_octets(switch_octets: list[str], tftp_octets: list[str]) -> bool:
     """
         Сравнивает 3 первых октета tftp сервера с октетами свитча
     """
@@ -31,10 +31,10 @@ def compare_octets(switch_octets , tftp_octets):
                 continue
         except(IndexError, KeyError):
             logging.info('Data error')
-        return
+        return False
 
 
-def detect_tftp_server(switch_name, tftp_servers):
+def detect_tftp_server(switch_name: str, tftp_servers: list) -> str:
     tftp_ip = BaseVendor.tftp_server
     try:
         switch_ip = socket.gethostbyname(switch_name)
@@ -50,17 +50,17 @@ def detect_tftp_server(switch_name, tftp_servers):
     return tftp_ip
 
 
-def get_date_time():
+def get_date_time() -> str:
     return datetime.datetime.now().strftime('%Y%m%d')
 
 
-def open_switch_filename(filename):
+def open_switch_filename(filename: str) -> list:
     with open(filename, 'r') as fs:
         switches = fs.read().splitlines()
         return switches
 
 
-def backup_over_console(switch_name, vendor):
+def backup_over_console(switch_name: str, vendor: ALL_DEVICE_VENDORS) -> None:
     tftp_server = detect_tftp_server(switch_name, config.TFTP_SERVERS)
 
     backup_command = vendor.make_backup_command(tftp_server, switch_name, get_date_time())
@@ -81,7 +81,6 @@ def backup_over_console(switch_name, vendor):
             switch.send_switch_custom_command('y'+CR_LF, 'Deleting.....', REQUIRED_PROMPT)
         else:
             switch.send_switch_custom_command(backup_command, vendor.backup_success_message, REQUIRED_PROMPT)
-            # switch.send_switch_command('display lldp neighbor brief')
         switch.switch_quit_command()
 
 
@@ -89,7 +88,7 @@ def backup_over_snmp(switch_name, vendor):
     pass
 
 
-def backup_over_http(switch_name, vendor):
+def backup_over_http(switch_name: str, vendor: ALL_DEVICE_VENDORS) -> None:
     tftp_server = detect_tftp_server(switch_name, config.TFTP_SERVERS)
     config_name = switch_name + '-' + get_date_time() + '.cfg'
     if vendor.vendor_name == HP_OC.vendor_name:
@@ -107,7 +106,7 @@ def backup_over_http(switch_name, vendor):
             logging.info(message)
 
 
-def backup_tftp_config(switch_name):
+def backup_tftp_config(switch_name: str) -> None:
     logging.info(f'Start backup of: {switch_name}')
     vendor = detect_vendor(switch_name)
     if vendor:
