@@ -60,8 +60,7 @@ def open_switch_filename(filename: str) -> list:
         return switches
 
 
-def backup_over_console(switch_name: str, vendor: ALL_DEVICE_VENDORS) -> None:
-    tftp_server = detect_tftp_server(switch_name, config.TFTP_SERVERS)
+def backup_over_console(switch_name: str, tftp_server: str, vendor: ALL_DEVICE_VENDORS) -> None:
 
     backup_command = vendor.make_backup_command(tftp_server, switch_name, get_date_time())
     with Switch(switch_name, vendor, 22, config.USERNAME, config.PASSWORD) as switch:
@@ -84,12 +83,11 @@ def backup_over_console(switch_name: str, vendor: ALL_DEVICE_VENDORS) -> None:
         switch.switch_quit_command()
 
 
-def backup_over_snmp(switch_name, vendor):
+def backup_over_snmp(switch_name, tftp_server: str, vendor):
     pass
 
 
-def backup_over_http(switch_name: str, vendor: ALL_DEVICE_VENDORS) -> None:
-    tftp_server = detect_tftp_server(switch_name, config.TFTP_SERVERS)
+def backup_over_http(switch_name: str, tftp_server: str, vendor: ALL_DEVICE_VENDORS) -> None:
     config_name = switch_name + '-' + get_date_time() + '.cfg'
     if vendor.vendor_name == HP_OC.vendor_name:
         with HPSwitch(switch_name,
@@ -109,21 +107,23 @@ def backup_over_http(switch_name: str, vendor: ALL_DEVICE_VENDORS) -> None:
 def backup_tftp_config(switch_name: str) -> None:
     logging.info(f'Start backup of: {switch_name}')
     vendor = detect_vendor(switch_name)
+    tftp_server = detect_tftp_server(switch_name, config.TFTP_SERVERS)
+    args = (switch_name, tftp_server, vendor)
     if vendor:
         if vendor.service == BaseVendor.SERVICE_SSH_ACCESS:
-            backup_over_console(switch_name, vendor)
+            backup_over_console(*args)
 
         if vendor.service == BaseVendor.SERVICE_TELNET_ACCESS:
-            backup_over_console(switch_name, vendor)
+            backup_over_console(*args)
 
         if vendor.service == BaseVendor.SERVICE_SNMP_ACCESS:
-            backup_over_snmp(switch_name, vendor)
+            backup_over_snmp(*args)
 
         if vendor.service == BaseVendor.SERVICE_HTTP_ACCESS:
-            backup_over_http(switch_name, vendor)
+            backup_over_http(*args)
 
     else:
-        logging.warning(f'Fail backup {switch_name}')
+        logging.warning(f'Vendor not found. Fail backup switch: {switch_name}')
     logging.info(f'End backup of {switch_name}...\r\n')
 
 
