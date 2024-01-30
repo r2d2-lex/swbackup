@@ -2,5 +2,6 @@ switches.cfg
 venv/*
 .idea/*
 __pycache__/*
+tests/__pycache__/*
 config.py
 switch_backup.log
