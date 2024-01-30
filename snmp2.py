@@ -22,10 +22,18 @@ def check_hex_string(string: str) -> str:
 
 
 def start_shell_command(cmd: str) -> str:
-    result = subprocess.run(cmd.split(), stdout=subprocess.PIPE)
-    output = result.stdout.decode('utf-8')
-    output = check_hex_string(output)
-    return output
+    try:
+        result = subprocess.run(cmd.split(), stdout=subprocess.PIPE)
+        print(result)
+
+        if result.returncode == 0:
+            return result.stdout.decode('utf-8')
+        else:
+            print(f'Wrong return code: {cmd}')
+
+    except (FileNotFoundError, PermissionError, OSError) as err:
+        print(f'Error running command: {cmd}\r\nDetails: {err}')
+    return ''
 
 
 def snmp_get_description(switch: str) -> str:
@@ -33,6 +41,7 @@ def snmp_get_description(switch: str) -> str:
     try:
         snmp_command = f'{config.SNMP_GET_COMMAND} -v2c -c {config.SNMP_COMMUNITY} {switch} {oidSysDescr}'
         result = start_shell_command(snmp_command)
+        result = check_hex_string(result)
     except TypeError:
         logging.error('Fail command: {}', result)
     return result
