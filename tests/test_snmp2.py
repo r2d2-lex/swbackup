@@ -1,5 +1,56 @@
-from unittest import TestCase
-from snmp2 import check_hex_string
+from unittest import TestCase, mock
+from snmp2 import check_hex_string, start_shell_command
+
+
+class StartShellCommandTestCase(TestCase):
+    def test_start_shell_command_function_exists(self):
+        import snmp2
+        self.assertTrue(
+            hasattr(snmp2, 'start_shell_command')
+        )
+
+    def test_start_shell_command_is_string_argument(self):
+        with self.assertRaises(AttributeError):
+            start_shell_command(1)
+
+    def test_start_shell_command_is_string_argument2(self):
+        with self.assertRaises(AttributeError):
+            start_shell_command(None)
+
+    def test_start_shell_command_must_take_one_argument(self):
+        with self.assertRaises(TypeError):
+            start_shell_command('1','2')
+
+    def test_start_shell_command_execution_returns_string(self):
+        self.assertTrue(isinstance(start_shell_command('echo 123'), str))
+
+    # except (FileNotFoundError, OSError, PermissionError, IndexError) as err:
+    def test_start_shell_command_exists(self):
+        try:
+            start_shell_command('/sbin/XyZwQwerty')
+        except FileNotFoundError:
+            self.fail('File must be exists')
+
+    def test_start_shell_command_right_format(self):
+        try:
+            start_shell_command('/etc/issue')
+        except OSError:
+            self.fail('Exec format error')
+
+    def test_start_shell_command_not_empty_string(self):
+        try:
+            start_shell_command('')
+        except IndexError:
+            self.fail('File must be exists')
+
+    def test_start_shell_command_must_permissions(self):
+        try:
+            start_shell_command('/root')
+        except PermissionError:
+            self.fail('File must be exists')
+
+    def test_start_shell_command_execution_returns(self):
+        self.assertEqual(start_shell_command('echo 123'), '123\n')
 
 
 """

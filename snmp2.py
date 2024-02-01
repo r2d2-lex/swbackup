@@ -23,15 +23,9 @@ def check_hex_string(string: str) -> str:
 
 def start_shell_command(cmd: str) -> str:
     try:
-        result = subprocess.run(cmd.split(), stdout=subprocess.PIPE)
-        print(result)
-
-        if result.returncode == 0:
-            return result.stdout.decode('utf-8')
-        else:
-            print(f'Wrong return code: {cmd}')
-
-    except (FileNotFoundError, PermissionError, OSError) as err:
+        result = subprocess.run(cmd.split(), stdout=subprocess.PIPE, text=True)
+        return result.stdout
+    except (FileNotFoundError, OSError, PermissionError, IndexError) as err:
         print(f'Error running command: {cmd}\r\nDetails: {err}')
     return ''
 
