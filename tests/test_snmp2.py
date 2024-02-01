@@ -37,17 +37,17 @@ class StartShellCommandTestCase(TestCase):
         except OSError:
             self.fail('Exec format error')
 
-    def test_start_shell_command_not_empty_string(self):
+    def test_start_shell_command_arg_not_empty_string(self):
         try:
             start_shell_command('')
         except IndexError:
-            self.fail('File must be exists')
+            self.fail('Argument must be not empty string')
 
     def test_start_shell_command_must_permissions(self):
         try:
             start_shell_command('/root')
         except PermissionError:
-            self.fail('File must be exists')
+            self.fail('Must have permissions to run the file')
 
     def test_start_shell_command_execution_returns(self):
         self.assertEqual(start_shell_command('echo 123'), '123\n')
