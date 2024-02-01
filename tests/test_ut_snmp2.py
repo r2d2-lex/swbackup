@@ -1,5 +1,13 @@
+# Тесты для UnitTest
 from unittest import TestCase, mock
-from snmp2 import check_hex_string, start_shell_command
+from snmp2 import check_hex_string, start_shell_command, snmp_get_description
+
+class SnmpGetDescriptionTestCase(TestCase):
+    def test_snmp_get_description_function_exists(self):
+        import snmp2
+        self.assertTrue(
+            hasattr(snmp2, 'snmp_get_description')
+        )
 
 
 class StartShellCommandTestCase(TestCase):
@@ -53,13 +61,11 @@ class StartShellCommandTestCase(TestCase):
         self.assertEqual(start_shell_command('echo 123'), '123\n')
 
 
-"""
-    iso.3.6.1.2.1.1.1.0 = Hex-STRING: 41 6C 6C 69 65 64 57 61 72 65 20 50 6C 75 73 20 
-    28 54 4D 29 20 32 2E 31 2E 32 CE 20
-"""
-
-
 class CheckHexStringTestCase(TestCase):
+    """
+        iso.3.6.1.2.1.1.1.0 = Hex-STRING: 41 6C 6C 69 65 64 57 61 72 65 20 50 6C 75 73 20
+        28 54 4D 29 20 32 2E 31 2E 32 CE 20
+    """
 
     def test_snmp2_module_exists(self):
         try:
