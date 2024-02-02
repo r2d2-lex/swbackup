@@ -25,7 +25,7 @@ def start_shell_command(cmd: str) -> str:
     try:
         result = subprocess.run(cmd.split(), stdout=subprocess.PIPE, text=True)
         return result.stdout
-    except (FileNotFoundError, OSError, PermissionError, IndexError) as err:
+    except (AttributeError, FileNotFoundError, OSError, PermissionError, IndexError) as err:
         print(f'Error running command: {cmd}\r\nDetails: {err}')
     return ''
 
