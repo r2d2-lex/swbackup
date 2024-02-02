@@ -1,6 +1,8 @@
 # Тесты для UnitTest
-from unittest import TestCase, mock
+from unittest import TestCase
+from unittest.mock import patch
 from snmp2 import check_hex_string, start_shell_command, snmp_get_description
+import subprocess
 
 class SnmpGetDescriptionTestCase(TestCase):
     def test_snmp_get_description_function_exists(self):
@@ -59,6 +61,12 @@ class StartShellCommandTestCase(TestCase):
 
     def test_start_shell_command_execution_returns(self):
         self.assertEqual(start_shell_command('echo 123'), '123\n')
+
+    @patch.object(subprocess, 'run')
+    def test_start_shell_command_execution_returns_right_value1(self, mock_subprocess_run):
+        mock_subprocess_run.return_value = subprocess.CompletedProcess(args=[], returncode=0, stdout='123\n')
+        result = start_shell_command('echo 123')
+        self.assertEqual(result, '123\n')
 
 
 class CheckHexStringTestCase(TestCase):
