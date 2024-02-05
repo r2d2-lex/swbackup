@@ -3,5 +3,6 @@ venv/*
 .idea/*
 __pycache__/*
 tests/__pycache__/*
+tests/tempdir/*
 config.py
 switch_backup.log

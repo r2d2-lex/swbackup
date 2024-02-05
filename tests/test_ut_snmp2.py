@@ -19,14 +19,6 @@ class StartShellCommandTestCase(TestCase):
             hasattr(snmp2, 'start_shell_command')
         )
 
-    def test_start_shell_command_is_string_argument(self):
-        with self.assertRaises(AttributeError):
-            start_shell_command(1)
-
-    def test_start_shell_command_is_string_argument2(self):
-        with self.assertRaises(AttributeError):
-            start_shell_command(None)
-
     def test_start_shell_command_must_take_one_argument(self):
         with self.assertRaises(TypeError):
             start_shell_command('1','2')
@@ -34,7 +26,14 @@ class StartShellCommandTestCase(TestCase):
     def test_start_shell_command_execution_returns_string(self):
         self.assertTrue(isinstance(start_shell_command('echo 123'), str))
 
-    # except (FileNotFoundError, OSError, PermissionError, IndexError) as err:
+    # except (AttributeError, FileNotFoundError, OSError, PermissionError, IndexError) as err:
+    def test_start_shell_command_is_string_argument(self):
+        try:
+            start_shell_command(1)
+            start_shell_command(None)
+        except AttributeError:
+            self.fail('Argument must be string')
+
     def test_start_shell_command_exists(self):
         try:
             start_shell_command('/sbin/XyZwQwerty')
