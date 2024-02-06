@@ -1,3 +1,4 @@
+import os
 import subprocess
 import config
 
@@ -32,6 +33,12 @@ def start_shell_command(cmd: str) -> str:
 
 def snmp_get_description(switch: str) -> str:
     result = ''
+
+    if config.SNMP_GET_COMMAND and config.SNMP_COMMUNITY and switch and oidSysDescr:
+        if not os.path.exists(config.SNMP_GET_COMMAND):
+            return result
+    else:
+        return result
     try:
         snmp_command = f'{config.SNMP_GET_COMMAND} -v2c -c {config.SNMP_COMMUNITY} {switch} {oidSysDescr}'
         result = start_shell_command(snmp_command)
