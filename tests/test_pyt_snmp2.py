@@ -33,16 +33,8 @@ def test_start_shell_command_function_exists():
         id='File must be exists',
     ),
     pytest.param(
-        ('/etc/issue',), OSError,
-        id='Exec format error',
-    ),
-    pytest.param(
         ('',), IndexError,
         id='Argument must be not empty string',
-    ),
-    pytest.param(
-        ('/root',), PermissionError,
-        id='Must have permissions to run the file',
     ),
 ]
 )
@@ -51,6 +43,12 @@ def test_start_shell_command_exception_handling(input_data, exception_type):
         start_shell_command(*input_data)
     except exception_type:
         pytest.fail('Fail')
+
+def test_start_shell_command_permissions_to_file(make_temp_file_without_run_permissions):
+    try:
+        start_shell_command(make_temp_file_without_run_permissions.name)
+    except (PermissionError, OSError):
+        pytest.fail('Must have permissions to run the file')
 
 def test_start_shell_command_must_take_one_argument():
     with pytest.raises(TypeError):
