@@ -36,8 +36,10 @@ def snmp_get_description(switch: str) -> str:
 
     if config.SNMP_GET_COMMAND and config.SNMP_COMMUNITY and switch and oidSysDescr:
         if not os.path.exists(config.SNMP_GET_COMMAND):
+            logging.error('Please set correct SNMP_GET_COMMAND')
             return result
     else:
+        logging.error('Please set correct variables in config.py')
         return result
     try:
         snmp_command = f'{config.SNMP_GET_COMMAND} -v2c -c {config.SNMP_COMMUNITY} {switch} {oidSysDescr}'
